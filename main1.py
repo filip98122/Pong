@@ -30,7 +30,7 @@ def write(writegold):
     f.close()
     return writegold
 
-
+4
 
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
@@ -81,7 +81,12 @@ class Player_1:
             if self.y <= 675:
                 if keys[pygame.K_DOWN]:
                     self.y += self.speed
-                    
+
+p1 = Player_1(75,337.5,25,125,0.2,0)
+
+
+p2 = Player_1(725,337.5,25,125,0.2,1)
+
 class Button:
     def __init__(self,x,y,width,height,text):
         self.x = x
@@ -110,57 +115,47 @@ class Ball:
     def draw(self,window):
         pygame.draw.circle(window,pygame.Color("White"),(self.x,self.y),self.size)
 
-    def move(self,p1_score,p2_score,times,predx,predy):
+    def move(self,p1_score,p2_score,times,player1_x,player2_x,player1_y,player2_y):
         if self.y  <= 15:
-            predy = self.dy * -1
+            self.dy *= -1
             
         if self.y  >= 785:
-            predy = self.dy * -1
+            self.dy *= -1
             
         if self.x  >= 785:
             p1_score += 1
-            times = 300
+            times = 3000
             self.x = 400
             self.y = 400
-            predx = self.dx
-            predy = self.dy
+            player1_x = 75
+            player1_y = 337.5
+            player2_x = 725
+            player2_y = 337.5
+            self.dx = 1
+            self.dy = -0.5
             
         if self.x  <= 15:
             p2_score += 1
-            times = 300
+            times = 3000
             self.x = 400
             self.y = 400
-            predx = self.dx
-            predy = self.dy
-
-        if times >= 0:
-            self.dx = 0
-            self.dy = 0
-
-
-        ball_rect = pygame.Rect(self.x - self.size, self.y - self.size, self.size * 2,self.size * 2)
-        
-        p1_rect = pygame.Rect(p1.x, p1.y, p1.width,p1.height)
-        
-        p2_rect = pygame.Rect(p2.x, p2.y, p2.width,p2.height)
-
-        if times < 0:
-            if colision1(ball_rect,p1_rect) and colision1(ball_rect,p2_rect) :
-                self.dx = predx
-                self.dy = predy
+            player1_x = 75
+            player1_y = 337.5
+            player2_x = 725
+            player2_y = 337.5
+            self.dx = -1
+            self.dy = -0.5
             
-        self.x += self.speed * self.dx
-        self.y += self.speed * self.dy
-        
-        
+        if times <= -1:
+            self.x += self.speed * self.dx
+            self.y += self.speed * self.dy
+        return [times,p1_score,p2_score]
+
+
+
 l_players = []
 
 ball = Ball(400,400,0.3,15,-1,-0.5)
-
-p1 = Player_1(75,337.5,25,125,0.2,0)
-
-
-p2 = Player_1(725,337.5,25,125,0.2,1)
 
 
 button = Button(250,300,250,150, "Play")
@@ -197,10 +192,14 @@ while True:
         
 
     if game == 1:
-        times -= 1
+        text_surface11 = myfont.render(f"{int(p1_score)}", True, (255,255,255))
+        window.blit(text_surface11, (150,100))
+        text_surface111 = myfont.render(f"{int(p2_score)}", True, (255,255,255))
+        window.blit(text_surface111, (550,100))
+        times = times - 1
         p2.move(keys)
         p1.move(keys)
-        ball.move(p1_score,p2_score,times,predx,predy)
+        times,p1_score,p2_score = ball.move(p1_score,p2_score,times,p1.x,p2.x,p1.y,p2.y)
         
         ball.draw(window)
         p1.draw(window)
@@ -213,11 +212,11 @@ while True:
         p2_rect = pygame.Rect(p2.x, p2.y, p2.width,p2.height)
         
         if colision1(ball_rect,p1_rect):
-            predx = ball.dx * -1
+            ball.dx *= -1
         
             
         if colision1(ball_rect,p2_rect):
-            predx = ball.dx * -1
+            ball.dx *= -1
         
             
     if keys[pygame.K_ESCAPE]:
